@@ -98,8 +98,8 @@ async def receive_commands(websocket):
             print("📥 コマンド受信:", msg)
 
             if "key" in msg:
-                GPIO.output(17, GPIO.HIGH if msg["key"] == "key:up" else GPIO.LOW)
-                print(f"💡 key {'up' if msg['key'] == 'key:up' else 'down'}")
+                GPIO.output(17, GPIO.HIGH if msg == "key:up" else GPIO.LOW)
+                print(f"💡 key {'up' if msg == 'key:up' else 'down'}")
         except Exception as e:
             print("⚠️ コマンドエラー:", e)
 
