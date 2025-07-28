@@ -1,105 +1,89 @@
-import React, { useState, useEffect, useRef } from "react";
+import { AppShell, Group, Text, Title, Image, Box } from "@mantine/core";
+import React, {useState, useRef} from "react";
+import style from "./App.module.scss";
 
-interface SystemData {
-  temperature: string;
-  voltage: string;
-  clock: string;
-  image: string;
-}
 
 const App: React.FC = () => {
-  const [ip, setIp] = useState(""); // 入力されたIPアドレス
-  const [connected, setConnected] = useState(false);
-  const [data, setData] = useState<SystemData | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [ip, setIp] = useState("");
+  const [messages, setMessages] = useState<string[]>([]);
   const socketRef = useRef<WebSocket | null>(null);
 
-  const connectToServer = () => {
+  const connect = () => {
     const url = `ws://${ip}:8765`;
     const socket = new WebSocket(url);
     socketRef.current = socket;
 
     socket.onopen = () => {
-      setConnected(true);
-      console.log("🔗 接続成功！");
+      console.log("接続成功！");
+      socket.send("こんにちは、サーバーさん！");
     };
 
     socket.onmessage = (event) => {
-      try {
-        const parsed: SystemData = JSON.parse(event.data);
-        setData(parsed);
-      } catch (err) {
-        console.error("⚠️ JSONのパースに失敗:", err);
-      }
+      setMessages((prev) => [...prev, `📨: ${event.data}`]);
     };
 
     socket.onerror = () => {
-      console.error("🚨 WebSocket エラー！");
-      setConnected(false);
+      setMessages((prev) => [...prev, "⚠️ 接続エラー！"]);
     };
 
     socket.onclose = () => {
-      console.log("🔌 切断されたわ");
-      setConnected(false);
+      setMessages((prev) => [...prev, "🔌 接続終了"]);
     };
   };
-
-  const disconnect = () => {
-    socketRef.current?.close();
-    socketRef.current = null;
-    setConnected(false);
-    setData(null);
-  };
-
   return (
-    <div style={{ padding: "1rem", fontFamily: "sans-serif", maxWidth: "600px", margin: "auto" }}>
-      <h2>📡 Raspberry Pi モニター</h2>
+    <AppShell
+      padding="md"
+      header={{ height: 60 }}
+      footer={{ height: 30 }}
+      >
+        <AppShell.Header>
+            <Group align="flex-end" justify="space-between" px="md">
+            <Title order={1} className={style.title} >
+              Raspi-Monitor
+            </Title>
+            </Group>
+        </AppShell.Header>
+        <AppShell.Main w="100vw">
+          <Group>
+            <Box w="30%" h="20%">
+              <Image
+                src=""
+                alt="Raspi-Monitor Logo"
+                fit="cover"
+                fallbackSrc="https://placehold.co/600x400?text=no+camera+available"
+              />
+            </Box>                      
+          </Group>
+        </AppShell.Main>
+        <AppShell.Footer>
+          <Group justify="right" px="md">
+            <Text>
+              © 2025 FROM THE EARTH all rights reserved.
+            </Text>
+          </Group>
+        </AppShell.Footer>
+    </AppShell>
+    // <div style={{ padding: "1rem" }}>
+    //   <h1>WebSocketクライアント</h1>
+    //   <input
+    //     type="text"
+    //     placeholder="例: 192.168.1.42"
+    //     value={ip}
+    //     onChange={(e) => setIp(e.target.value)}
+    //   />
+    //   <button onClick={connect}>接続！</button>
 
-      <div style={{ marginBottom: "1rem" }}>
-        <input
-          type="text"
-          placeholder="例: 192.168.1.42"
-          value={ip}
-          onChange={(e) => setIp(e.target.value)}
-          disabled={connected}
-          style={{ padding: "0.5rem", fontSize: "1rem", width: "60%" }}
-        />
-        {!connected ? (
-          <button
-            onClick={connectToServer}
-            style={{ marginLeft: "0.5rem", padding: "0.5rem", fontSize: "1rem" }}
-          >
-            接続
-          </button>
-        ) : (
-          <button
-            onClick={disconnect}
-            style={{ marginLeft: "0.5rem", padding: "0.5rem", fontSize: "1rem" }}
-          >
-            切断
-          </button>
-        )}
-      </div>
+    //   <div style={{ marginTop: "1rem" }}>
+    //     <h2>メッセージログ</h2>
+    //     <ul>
+    //       {messages.map((msg, idx) => (
+    //         <li key={idx}>{msg}</li>
+    //       ))}
+    //     </ul>
+    //   </div>
+    // </div>
+  )
+}
 
-      {connected ? (
-        data ? (
-          <div>
-            <p>🌡 温度: {data.temperature}</p>
-            <p>⚡ 電圧: {data.voltage}</p>
-            <p>🕓 クロック: {data.clock}</p>
-            <img
-              src={`data:image/jpeg;base64,${data.image}`}
-              alt="カメラ画像"
-              style={{ width: "100%", borderRadius: "8px", border: "1px solid #ccc" }}
-            />
-          </div>
-        ) : (
-          <p>⏳ データ受信中…</p>
-        )
-      ) : (
-        <p>🔌 接続されていません</p>
-      )}
-    </div>
-  );
-};
-
-export default App;
+export default App
