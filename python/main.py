@@ -8,14 +8,12 @@ import threading
 from io import BytesIO
 from picamera2 import Picamera2
 from PIL import Image
-import RPi.GPIO as GPIO
+import motor
+
+# モーターをセットアップ
+motor.setup()
 
 PORT = 8765
-
-# --- GPIO 初期化（LED用: GPIO 17） ---
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(17, GPIO.OUT)
-GPIO.output(17, GPIO.LOW)
 
 # --- カメラスレッド用共有変数 ---
 latest_image_b64 = ""
@@ -98,8 +96,17 @@ async def receive_commands(websocket):
             print("📥 コマンド受信:", msg)
 
             if "key" in msg:
-                GPIO.output(17, GPIO.HIGH if msg == "key:up" else GPIO.LOW)
-                print(f"💡 key {'up' if msg == 'key:up' else 'down'}")
+                direction = msg.split(":")[1] if ":" in msg else ""
+                print(f"💡 key {direction}")
+                match direction:
+                    case "up":
+                        motor.forward()
+                    case "right":
+                        motor.turn_right()
+                    case "left":
+                        motor.turn_left()
+                    case _:
+                        motor.stop()
         except Exception as e:
             print("⚠️ コマンドエラー:", e)
 
@@ -133,4 +140,4 @@ if __name__ == "__main__":
         print("👋 終了するよ〜")
     finally:
         camera_running = False
-        GPIO.cleanup()
+        motor.cleanup()
