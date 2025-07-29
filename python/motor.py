@@ -19,9 +19,7 @@ speed = 50
 
 
 # GPIOの設定
-def setup(
-    left_motor_forward, left_motor_backward, right_motor_forward, right_motor_backward
-):
+def setup():
     global pwm_left_forward, pwm_left_backward, pwm_right_forward, pwm_right_backward
 
     GPIO.setmode(GPIO.BCM)
