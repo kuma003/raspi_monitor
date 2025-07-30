@@ -3,6 +3,8 @@ import json
 
 json_data = json.loads(open("config.json", "r").read())
 # モーターピン定義
+left_motor_limitation = json_data["left_motor_limitation"]
+right_motor_limitation = json_data["right_motor_limitation"]
 left_motor_forward = json_data["left_motor_forward"]
 left_motor_backward = json_data["left_motor_backward"]
 right_motor_forward = json_data["right_motor_forward"]
@@ -46,15 +48,15 @@ def setup():
 
 
 # 前進
-def forward(speed=50):
-    pwm_left_forward.ChangeDutyCycle(speed)
+def forward(speed=100):
+    pwm_left_forward.ChangeDutyCycle(speed * left_motor_limitation)
     pwm_left_backward.ChangeDutyCycle(0)
-    pwm_right_forward.ChangeDutyCycle(speed)
+    pwm_right_forward.ChangeDutyCycle(speed * right_motor_limitation)
     pwm_right_backward.ChangeDutyCycle(0)
 
 
 # 後退
-def backward(speed=50):
+def backward(speed=100):
     pwm_left_forward.ChangeDutyCycle(0)
     pwm_left_backward.ChangeDutyCycle(speed)
     pwm_right_forward.ChangeDutyCycle(0)
@@ -62,18 +64,18 @@ def backward(speed=50):
 
 
 # 左折
-def turn_left(speed=50):
-    pwm_left_forward.ChangeDutyCycle(0.5 * speed)
+def turn_left(speed=100):
+    pwm_left_forward.ChangeDutyCycle(0.5 * speed * left_motor_limitation)
     pwm_left_backward.ChangeDutyCycle(0)
-    pwm_right_forward.ChangeDutyCycle(speed)
+    pwm_right_forward.ChangeDutyCycle(speed * right_motor_limitation)
     pwm_right_backward.ChangeDutyCycle(0)
 
 
 # 右折
-def turn_right(speed=50):
-    pwm_left_forward.ChangeDutyCycle(speed)
+def turn_right(speed=100):
+    pwm_left_forward.ChangeDutyCycle(speed * left_motor_limitation)
     pwm_left_backward.ChangeDutyCycle(0)
-    pwm_right_forward.ChangeDutyCycle(0.5 * speed)
+    pwm_right_forward.ChangeDutyCycle(0.5 * speed * right_motor_limitation)
     pwm_right_backward.ChangeDutyCycle(0)
 
 

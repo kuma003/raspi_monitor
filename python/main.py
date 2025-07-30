@@ -38,8 +38,20 @@ def get_temperature():
 
 def get_voltage():
     try:
-        out = subprocess.check_output(["vcgencmd", "measure_volts"])
-        return out.decode().strip().split("=")[1]
+        core = subprocess.check_output(["vcgencmd", "measure_volts", "core"])
+        core = core.decode().strip().split("=")[1]
+        sdram_c = subprocess.check_output(["vcgencmd", "measure_volts", "sdram_c"])
+        sdram_c = sdram_c.decode().strip().split("=")[1]
+        sdram_i = subprocess.check_output(["vcgencmd", "measure_volts", "sdram_i"])
+        sdram_i = sdram_i.decode().strip().split("=")[1]
+        sdram_p = subprocess.check_output(["vcgencmd", "measure_volts", "sdram_p"])
+        sdram_p = sdram_p.decode().strip().split("=")[1]
+        return {
+            "core": core,
+            "sdram_c": sdram_c,
+            "sdram_i": sdram_i,
+            "sdram_p": sdram_p,
+        }
     except:
         return None
 
