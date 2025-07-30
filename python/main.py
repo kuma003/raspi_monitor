@@ -71,7 +71,7 @@ def camera_loop():
     try:
         picam = Picamera2()
         config = picam.create_still_configuration(
-            main={"format": "RGB888", "size": (640, 480)}
+            main={"format": "BGR888", "size": (640, 480)}
         )
         picam.configure(config)
         picam.start()
@@ -90,9 +90,7 @@ def camera_loop():
 async def send_sensor_data(websocket):
     while True:
         data = {
-            "temperature": (
-                f"{get_temperature():.1f} °C" if get_temperature() else "N/A"
-            ),
+            "temperature": (f"{get_temperature():.1f}" if get_temperature() else "N/A"),
             "voltage": get_voltage() or "N/A",
             "clock": get_clock() or "N/A",
             "image": latest_image_b64 or "",
