@@ -71,7 +71,7 @@ def camera_loop():
     try:
         picam = Picamera2()
         config = picam.create_still_configuration(
-            main={"format": "BGR888", "size": (640, 480)}, transform={"vflip": True}
+            main={"format": "BGR888", "size": (640, 480)}
         )
         picam.configure(config)
         picam.start()
