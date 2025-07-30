@@ -1,6 +1,6 @@
 {
-  "left_power_limitation": 1,
-  "right_power_limitation": 1,
+  "left_motor_limitation": 1,
+  "right_motor_limitation": 1,
   "left_motor_forward": 5,
   "left_motor_backward": 6,
   "right_motor_forward": 19,
